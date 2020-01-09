@@ -1,0 +1,32 @@
+# node.js
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Primephonic specific
+build
+
+# local config file
+local.config
+*.secrets
+
+# Editors
+.idea
+.DS_store
+.vscode
+
+# Python venv
+pyvenv.cfg
+bin/
+lib/
+include/
+
+# google credentials
+src/conf/primephonic-irs-dev-bd977ef28451.js
+
+# testing coverage output
+coverage/
+
+
+# temporary file generated on some runs, move to utilities if not there
+currencies.json

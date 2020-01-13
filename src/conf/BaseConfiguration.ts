@@ -14,15 +14,21 @@ export interface RdsConfig {
 export class BaseConfiguration {
   public readonly isDevelopment: boolean;
   public readonly InpactRdsConfig: RdsConfig;
+  public readonly cookieKey: string;
 
   constructor() {
     this.isDevelopment = this.getIsDevelopment();
     this.InpactRdsConfig = this.getDefautlRdsValues();
+    this.cookieKey = this.getCookieKey();
   }
 
   protected getValue(name: string): string {
     nconf.required([name])
     return nconf.get(name)
+  }
+
+  private getCookieKey(): string {
+    return this.getValue('COOKIE_KEY');
   }
 
   private getIsDevelopment(): boolean {
@@ -49,5 +55,7 @@ export class BaseConfiguration {
       max: 100 // This is the max size pooled connections per node instance
     };
   }
+
+
 
 }

@@ -1,10 +1,15 @@
-import { PostgresService } from "../../services/PostgresService";
-import { BaseConfiguration } from "../../conf/BaseConfiguration";
+// import { PostgresService } from "../../services/PostgresService";
+// import { BaseConfiguration } from "../../conf/BaseConfiguration";
+import request = require('supertest');
+import app from '../../index'
 
-describe("Checking that users have been inserted", () => {
-  const postgresService = new PostgresService(BaseConfiguration.getTestRdsValues())
-  test('nothing yet', () => {
-    console.log(postgresService)
-    expect(1).toBe(1);
+describe('/api', () => {
+  describe('GET /test', () => {
+    test('should return one user', async () => {
+      const res = await request(app).get('/api/test')
+      expect(res.status).toEqual(200)
+      expect(res.body).toHaveProperty('email')
+      expect(res.body.email).toBe('pablo@admin.com')
+    })
   })
 })

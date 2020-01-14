@@ -3,13 +3,12 @@ import 'dotenv/config';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors'; // allows for restricting querying from specific url's
-import * as passport from 'passport'; // import passport to initialize & start passport.session().
+const passport = require('passport'); // import passport to initialize & start passport.session().
 const cookieSession = require('cookie-session'); //encrypting keys
 // require('./auth/passport'); // Used for signing tokens, (i.e. checking user is Good), switch if not using cookies (ie. session auth).
 
 const routes = require('./routes');
 import { BaseConfiguration } from './conf';
-
 
 // Express app setup
 const app = express();

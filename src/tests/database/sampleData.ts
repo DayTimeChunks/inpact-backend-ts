@@ -1,12 +1,17 @@
+import * as bcrypt from 'bcryptjs'
 export const getUsersSampleData = (): any[] => {
   // We need to find a way to make this a little bit more scalable
   // 1
+
+  const salt = bcrypt.genSaltSync();
+  const hash = bcrypt.hashSync('password', salt);
+
   const admin_user_pablo = [{
     email: "pablo@admin.com",
     name: "Pablo",
     last_name: "",
     username: "pablo",
-    password: "password",
+    password: hash,
     is_admin: "true",
     address: "",
     country: "",
@@ -22,7 +27,7 @@ export const getUsersSampleData = (): any[] => {
     name: "Antoine",
     last_name: "",
     username: "antoine",
-    password: "password",
+    password: hash,
     is_admin: "true",
     address: "",
     country: "",
@@ -38,7 +43,7 @@ export const getUsersSampleData = (): any[] => {
     name: "Pedro",
     last_name: "Vacher",
     username: "Pedrito",
-    password: "password",
+    password: hash,
     is_admin: "false",
     address: "",
     country: "",
@@ -53,7 +58,7 @@ export const getUsersSampleData = (): any[] => {
     name: "Random",
     last_name: "Jones",
     username: "jones",
-    password: "password",
+    password: hash,
     is_admin: "false",
     address: "",
     country: "",

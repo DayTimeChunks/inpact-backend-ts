@@ -1,9 +1,9 @@
-import Auth from '../auth/Auth';
-import * as passport from 'passport';
+import Auth, { generateJWT } from '../auth/Auth';
 import * as express from 'express';
 import { BaseConfiguration } from '../conf';
 import { PostgresService } from '../services';
 import SQL = require('sql-template');
+const passport = require('../auth/local');
 const appApi = express.Router()
 
 const auth = new Auth();
@@ -34,19 +34,18 @@ appApi.get('/test', async (req, res, next)  => {
 })
 
 appApi.post('/users/login', auth.loginRedirect, (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {  // see: ./auth/local.js @LocalStrategy
+  passport.authenticate('local', (err: any, user: any, info: any) => {  // see: ./auth/local.js @LocalStrategy
     if (err) { handleResponse(res, 500, 'error'); }
-    if (!user) { handleResponse(res, 404, 'User not found'); }
+    if (!user) { handleResponse(res, 404, 'User not found or password was incorrect'); }
     if (user) {
       req.logIn(user, function (err) {
         if (err) { handleResponse(res, 500, 'error'); }
         // A public version of the user is sent back,
         // to keep compatibility with front-end handling token vs. session handling.
-        console.log("passed req.logIn, generating token for ", user);
         handleResponse(res, 200, 'success', {
             username: user.username,
             email: user.email,
-            token: auth.generateJWT(user)
+            token: generateJWT(user)
           });
       });
     }
@@ -57,7 +56,6 @@ function handleResponse(res: any, code: any, statusMsg: any, user: any = {}) {
   /* Returns a user if user, else {status: message}
   * */
   if (user) {
-    // console.log("returning json with user to FE", user);
     user.statusText = statusMsg;
     return res.status(code).json(user);
   }

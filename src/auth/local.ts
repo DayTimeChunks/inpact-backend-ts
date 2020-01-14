@@ -1,28 +1,28 @@
-import * as passport from 'passport';
 import Auth from './Auth';
 import { PostgresService } from '../services';
 import { BaseConfiguration } from '../conf';
-import * as SQL from 'sql-template';
 
-// const LocalStrategy = require('passport-local').Strategy;
-import { Strategy as LocalStrategy } from 'passport-local';
+// Use of require('...) for imports here is IMPORTANT!!
+import SQL = require('sql-template');
+import passport = require('passport');
+import passportLocal = require('passport-local'); 
+const LocalStrategy = passportLocal.Strategy;
 
 const auth = new Auth();
 const configuration = new BaseConfiguration();
 const dbService = new PostgresService(configuration.InpactRdsConfig);
 
-interface IUser {
-  id: number;
-  email: string;
-  password: string;
-}
+// interface IUser {
+//   id: number;
+//   email: string;
+//   password: string;
+// }
 
-// init();
-passport.serializeUser((user: IUser, done) => {
+passport.serializeUser((user: any, done: any) => {
   done(null, user.id); // serialized id to pack into the cookie
 });
 
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async (id: any, done: any) => {
   try {
     // Limit search to 2 (instead of one) for indexing performance
     const result = await dbService.query(SQL`
@@ -47,15 +47,16 @@ passport.use(new LocalStrategy(options, async (email: string, password: string, 
   // check to see if the email exists
   try {
     const result = await dbService.query(SQL`
-      SELECT * from users
+      SELECT * from public.users
       WHERE email = ${email}
       LIMIT 2
     `)
-    const user: IUser = result.rows[0]
+    const user: any = result.rows[0]
     if (!user) return done(null, false);
     if (!auth.comparePassword(password, user.password)) return done(null, false);
-    return done(null, user);  // user is now passed to passport.serialize(()=>)
+    return done(null, user);  // user is now passed to passport.serialize()
   } catch (err) {
+    console.warn('Error on LocalStrategy');
     return done(err);
   }
 }));

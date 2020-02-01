@@ -5,18 +5,12 @@ import { BaseConfiguration } from '../conf';
 // Use of require('...) for imports here is IMPORTANT!!
 import SQL = require('sql-template');
 import passport = require('passport');
-import passportLocal = require('passport-local'); 
+import passportLocal = require('passport-local');
 const LocalStrategy = passportLocal.Strategy;
 
-const auth = new Auth();
 const configuration = new BaseConfiguration();
+const auth = new Auth(configuration.InpactRdsConfig);
 const dbService = new PostgresService(configuration.InpactRdsConfig);
-
-// interface IUser {
-//   id: number;
-//   email: string;
-//   password: string;
-// }
 
 passport.serializeUser((user: any, done: any) => {
   done(null, user.id); // serialized id to pack into the cookie
@@ -38,9 +32,13 @@ passport.deserializeUser(async (id: any, done: any) => {
   }
 });
 
+/**
+ * Options define how the request object/payload is built, here,
+ * the FE is sending this object: IUserLoginPayload
+ */
 const options = {
-  usernameField: 'user[email]',
-  passwordField: 'user[password]'
+  usernameField: 'email',
+  passwordField: 'password'
 };
 
 passport.use(new LocalStrategy(options, async (email: string, password: string, done: any) => {
@@ -52,11 +50,12 @@ passport.use(new LocalStrategy(options, async (email: string, password: string, 
       LIMIT 2
     `)
     const user: any = result.rows[0]
+    // console.warn("user-->>>> ", user)
     if (!user) return done(null, false);
     if (!auth.comparePassword(password, user.password)) return done(null, false);
     return done(null, user);  // user is now passed to passport.serialize()
   } catch (err) {
-    console.warn('Error on LocalStrategy');
+    // console.warn("passed-->>>> ", err)
     return done(err);
   }
 }));

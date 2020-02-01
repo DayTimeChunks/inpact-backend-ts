@@ -4,34 +4,25 @@ import SQL = require("sql-template");
 import request = require('supertest');
 import app from '../../index'
 
-describe('/api', () => {
+describe('/api/users/login', () => {
 
   describe('Check database setup', () => {
-    test('DB should not be empty', async () => {
+    test('DB should not be empty', async (done) => {
       const dbService = new PostgresService(BaseConfiguration.getTestRdsValues())
       const result = await dbService.query(SQL`
         SELECT * from users
       `)
       expect(result.rows.length).toBe(4)
+      done()
     }, 5000)
   })
 
-  describe('GET /test', () => {
-    test('should return one user', async () => {
-      const res = await request(app).get('/api/test')
-      expect(res.status).toEqual(200)
-      expect(res.body).toHaveProperty('email')
-      expect(res.body.email).toBe('pablo@admin.com')
-    }, 20000)
-  })
+  describe('POST with WRONG password', () => {
 
-  describe('POST /users/login with WRONG password', () => {
-
-    test('Should not return user object', async () => {
-      const body = { "user": {
-          "email": "pablo@admin.com",
-          "password": "wrong-password"
-        }
+    test('Should not return user object', async (done) => {
+      const body = { 
+        "email": "pablo@admin.com",
+        "password": "wrong-password"
       }
       const res = await request(app).post('/api/users/login').send(Object.assign(body, {
         headers: {
@@ -46,12 +37,11 @@ describe('/api', () => {
 
   })
 
-  describe('POST /users/login with GOOD password', () => {
+  describe('POST with GOOD password', () => {
     test('Should return user with token', async () => {
-      const body = { "user": {
-          "email": "pablo@admin.com",
-          "password": "password"
-        }
+      const body = {
+        "email": "pablo@admin.com",
+        "password": "password"
       }
       const res = await request(app).post('/api/users/login').send(Object.assign(body, {
         headers: {

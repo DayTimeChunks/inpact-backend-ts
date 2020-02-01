@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rm -rf build && (cd src && tsc)",
     "start": "npm run build && clear && source config/local-config.sh && node build/index.js",
-    "test": "npm run build && source config/local-config.sh && sh ./setup-test-db.sh && cd ./src && jest --forceExit",
+    "test": "npm run build && source config/local-config.sh && sh ./setup-test-db.sh && cd ./src && jest --runInBand",
     "coverage": "npm run build && source config/local-config.sh && sh ./setup-test-db.sh && cd ./src && clear && jest --coverage --forceExit"
   },
   "author": "P.A.Z.",

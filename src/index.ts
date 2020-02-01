@@ -87,8 +87,11 @@ if (!isProduction) {
 
 // finally, let's start our server...
 const port = process.env.PORT || 5000;
-app.listen(port, function() {
-  console.log(`Listening on port: ${port}`);
-});
+if(!module.parent){
+  app.listen(port, function() {
+    console.log(`Listening on port: ${port}`);
+  });
+  
+}
 
 export default app;

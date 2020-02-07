@@ -51,7 +51,7 @@ describe('api/get-profile', () => {
       expect(res.status).toEqual(200)
       expect(res.body.statusText).toBe('success')
       expect(res.body.email).toBe(email)
-      expect(res.body.username).toBe('pablo')
+      expect(res.body.user_name).toBe('pablo')
     })
   })
 })

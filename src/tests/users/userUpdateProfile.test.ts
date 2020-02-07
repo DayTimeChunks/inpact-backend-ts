@@ -17,7 +17,10 @@ async function resetUser(email: string) {
 
 describe('api/update-profile', () => {
 
-  afterAll(async () => await resetUser('pablo@admin.com'))
+  afterAll(async (done) => {
+    await resetUser('pablo@admin.com')
+    done()
+  })
 
   describe('POST: update user profile "interests" field', () => {
     const email = 'pablo@admin.com'
@@ -38,7 +41,7 @@ describe('api/update-profile', () => {
       expect(res.status).toEqual(200)
       expect(res.body.statusText).toBe('success')
       expect(res.body.email).toBe(email)
-      expect(res.body.username).toBe('pablo')
+      expect(res.body.user_name).toBe('pablo')
       expect(res.body.interests).toBe('surfing')
       done()
     })

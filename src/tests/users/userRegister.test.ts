@@ -15,16 +15,14 @@ async function deleteUser(email: string) {
 describe('api/register', () => {
 
   const body = {
-    "user": {
-      "email": "peter@test1.com",
-      "password": "password",
-      "name": "Peter",
-      "last_name": "Still",
-    }
+    "email": "peter@test1.com",
+    "password": "password",
+    "first_name": "Peter",
+    "last_name": "Still",
   }
 
-  describe('GET: /test', () => {
-    test('should return one user', async () => {
+  describe('GET: general /test endpoint', () => {
+    test('should return user of pablo as admin', async () => {
       const res = await request(app).get('/api/test')
       expect(res.status).toEqual(200)
       expect(res.body).toHaveProperty('email')
@@ -34,19 +32,18 @@ describe('api/register', () => {
 
   describe('POST: register new user', () => {
 
-    beforeAll(async () => {
+    afterAll(async (done) => {
       await deleteUser('peter@test1.com')
+      done();
     })
 
     test('should not create new user if not all details are included', async () => {
 
       const incompleteBody = {
-        "user": {
-          "email": "peter@test1.com",
-          "password": "password",
-          "name": "",
-          "last_name": "",
-        }
+        "email": "peter@test1.com",
+        "password": "password",
+        "first_name": "",
+        "last_name": "",
       }
       const res = await request(app).post('/api/register').send(Object.assign(incompleteBody, {
         headers: {
@@ -68,7 +65,7 @@ describe('api/register', () => {
       expect(res.status).toEqual(200)
       expect(res.body).toHaveProperty('email');
       expect(res.body).toHaveProperty('token');
-      expect(res.body).toHaveProperty('username');
+      expect(res.body).toHaveProperty('user_name');
     })
 
     test('should not create new user if email already exists', async () => {

@@ -33,12 +33,13 @@ describe('/api/users/login', () => {
       expect(res.status).toEqual(404)
       expect(res.body).toHaveProperty('statusText') // User not found
       expect(res.body.statusText).toBe('User not found or password was incorrect');
+      done();
     }, 5000) // add timeout to allow time for completion
 
   })
 
   describe('POST with GOOD password', () => {
-    test('Should return user with token', async () => {
+    test('Should return user with token', async (done) => {
       const body = {
         "email": "pablo@admin.com",
         "password": "password"
@@ -51,9 +52,10 @@ describe('/api/users/login', () => {
       }))
       expect(res.status).toEqual(200)
       expect(res.body).toHaveProperty('email');
-      expect(res.body).toHaveProperty('username');
+      expect(res.body).toHaveProperty('user_name');
       expect(res.body).toHaveProperty('token');
       expect(res.body.statusText).toBe('success');
+      done();
     }, 5000) // add timeout to allow time for completion
   })
 

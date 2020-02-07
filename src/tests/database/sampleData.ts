@@ -8,9 +8,9 @@ export const getUsersSampleData = (): any[] => {
 
   const admin_user_pablo = [{
     email: "pablo@admin.com",
-    name: "Pablo",
+    first_name: "Pablo",
     last_name: "",
-    username: "pablo",
+    user_name: "pablo",
     password: hash,
     is_admin: "true",
     address: "",
@@ -24,9 +24,9 @@ export const getUsersSampleData = (): any[] => {
 
   const admin_user_antoine = [{
     email: "antoine@admin.com",
-    name: "Antoine",
+    first_name: "Antoine",
     last_name: "",
-    username: "antoine",
+    user_name: "antoine",
     password: hash,
     is_admin: "true",
     address: "",
@@ -40,9 +40,9 @@ export const getUsersSampleData = (): any[] => {
 
   const basic_user_1 = [{
     email: "basicuser1@test.com",
-    name: "Pedro",
+    first_name: "Pedro",
     last_name: "Vacher",
-    username: "Pedrito",
+    user_name: "Pedrito",
     password: hash,
     is_admin: "false",
     address: "",
@@ -55,9 +55,9 @@ export const getUsersSampleData = (): any[] => {
   }];
   const user_no_avatar = [{
     email: "usernoavatar@test.com",
-    name: "Random",
+    first_name: "Random",
     last_name: "Jones",
-    username: "jones",
+    user_name: "jones",
     password: hash,
     is_admin: "false",
     address: "",

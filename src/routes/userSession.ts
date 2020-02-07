@@ -43,7 +43,7 @@ appApi.post('/register', auth.loginRedirect, async (req, res, next)  => {
             // A public version of the user is sent back,
             // to keep compatibility with front-end handling token vs. session handling.
           handleResponse(res, 200, 'success', {
-              username: user.username,
+              user_name: user.user_name,
               email: user.email,
               token: generateJWT(user)
           });
@@ -67,7 +67,7 @@ appApi.post('/users/login', auth.loginRedirect, (req, res, next) => {
         // A public version of the user is sent back,
         // to keep compatibility with front-end handling token vs. session handling.
         handleResponse(res, 200, 'success', {
-            username: user.username,
+            user_name: user.user_name,
             email: user.email,
             token: generateJWT(user)
           });
@@ -112,9 +112,9 @@ appApi.post('/update-profile', auth.loginRequired, async (req, res, next)  => {
     }
 
     // Updates user's profile except avatar (see below for avatar)
-    const newEmail = req.body.user.newEmail ? req.body.user.newEmail: email;
-    const username = req.body.user.username || user.username;
-    const name = req.body.user.name  || user.name;
+    const new_email = req.body.user.new_email ? req.body.user.new_email: email;
+    const user_name = req.body.user.user_name || user.user_name;
+    const first_name = req.body.user.first_name  || user.first_name;
     const last_name = req.body.user.last_name || user.last_name;
     const country = req.body.user.country || user.country;
     const about_me = req.body.user.about_me || user.about_me;
@@ -133,7 +133,7 @@ appApi.post('/update-profile', auth.loginRequired, async (req, res, next)  => {
 
     const updatedUser = await dbService.query(SQL`
       UPDATE users
-      SET email=${newEmail}, name=${name}, last_name=${last_name}, username=${username},
+      SET email=${new_email}, first_name=${first_name}, last_name=${last_name}, user_name=${user_name},
         password=${password}, address=${address}, country=${country}, about_me=${about_me}, education=${education}, 
         experiences=${experiences}, interests=${interests}
       WHERE email=${email}

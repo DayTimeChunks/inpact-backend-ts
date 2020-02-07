@@ -35,9 +35,9 @@ export default class Auth {
       const user = {
         email: req.body.email || undefined,
         password: hash || undefined,
-        name: req.body.name || undefined,
-        last_name: req.body.lastname || undefined,
-        username: req.body.name || undefined,
+        first_name: req.body.first_name || undefined,
+        last_name: req.body.last_name || undefined,
+        user_name: req.body.first_name || undefined,
       }
       const result = await this.pgService.query(SQL`
         INSERT INTO public.users
@@ -90,7 +90,7 @@ export default class Auth {
     if (!req.body) console.log('no body on request:', req);
     if (req.body.user) return res.status(401).json({
       user: {
-        username: req.body.user.username,
+        user_name: req.body.user.user_name,
         token: generateJWT(req.body.user)
       },
       status: 'You are already logged in'});
@@ -99,11 +99,13 @@ export default class Auth {
 
   public toAuthJSON(user: IUser) {
     return {
-      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      user_name: user.user_name,
       email: user.email,
       token: generateJWT(user),
       about_me: user.about_me,
-      acatar: user.avatar
+      avatar: user.avatar
     };
   }
 }
@@ -111,7 +113,7 @@ export default class Auth {
   * Token Authorization
   * (not in use, only for test case)
   * */
-export function generateJWT(user: any){
+export function generateJWT(user: IUser){
   let expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + 60);
 
@@ -119,7 +121,7 @@ export function generateJWT(user: any){
   const secret: string = process.env.SECRET || '';
   return jwt.sign({
     id: user.id,  // user database id
-    username: user.username,
+    user_name: user.user_name,
     exp: expiryDate.getTime()/1000, // UNIX time stamp in secs for expiry.
   }, secret);
 }

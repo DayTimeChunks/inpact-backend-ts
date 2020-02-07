@@ -19,9 +19,9 @@ export async function m001_InpactDBcreation(client: PoolClient) {
     CREATE TABLE public.users (
       id SERIAL PRIMARY KEY,
       email varchar(42) UNIQUE,
-      name varchar(42) NOT NULL,
+      first_name varchar(42) NOT NULL,
       last_name varchar(42) NOT NULL,
-      username varchar(42) NOT NULL,
+      user_name varchar(42) NOT NULL,
       password text NOT NULL,
       is_admin boolean NOT NULL DEFAULT false,
       address text DEFAULT NULL,

@@ -6,8 +6,8 @@ export interface IUserLoginPayload {
 
 export interface IRequest {
   body: {
-    name: string;
-    lastname: string;
+    first_name: string;
+    last_name: string;
     email: string;
     password: string;
   };
@@ -20,8 +20,9 @@ export interface IMessage {
 export interface IUser {
   id: number;
   email: string;
+  first_name: string;
   last_name: string;
-  username: string;
+  user_name: string;
   password: string;
   is_admin: boolean;
   address?: string;

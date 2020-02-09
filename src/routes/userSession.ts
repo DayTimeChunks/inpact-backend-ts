@@ -3,6 +3,7 @@ import * as express from 'express';
 import { BaseConfiguration } from '../conf';
 import { PostgresService } from '../services';
 import SQL = require('sql-template');
+import { LoremIpsum } from "lorem-ipsum";
 const passport = require('../auth/local');
 const appApi = express.Router()
 
@@ -56,6 +57,54 @@ appApi.post('/register', auth.loginRedirect, async (req, res, next)  => {
   }
 });
 
+appApi.post('/get-campaigns',  auth.loginRequired, async (req, res, next)  => {
+  const email = req.body.user.email;
+  const lorem = new LoremIpsum({
+    sentencesPerParagraph: {
+      max: 8,
+      min: 4
+    },
+    wordsPerSentence: {
+      max: 16,
+      min: 4
+    }
+  });
+  try {
+    // TODO:
+    // const result = await dbService.query(SQL`
+    //   SELECT * from users
+    //   WHERE email = ${email};
+    //   `)
+    // const user = result.rows[0]
+    let campaigns = [1, 2, 3, 4, 5, 6, 7].map(c => {
+      const rand = Math.random()
+      return {
+        id: c,
+        email,
+        stage: c === 7 ? "archived" : c % 2 === 0 ? "funding": "ongoing",
+        funding: {
+          goal: 500 * c,
+          raised: 500 * c * rand,
+          currency: c === 7 ? "US $" : c % 2 === 0 ? "€": "£",
+        },
+        timeline: {
+          remainingDays: c,
+          startDate: new Date()
+        },
+        title: lorem.generateSentences(1),
+        description: lorem.generateParagraphs(1),
+        image: `https://dummyimage.com/600x400/000/fff.png&text=Project-${c}`
+      }
+    })
+    if (campaigns && email === 'pablo@admin.com') {
+      return handleResponse(res, 200, 'success', campaigns);
+    }
+    return res.status(404).send("No campaigns found")
+  } catch (err) {
+    return handleError(res, err, 'get-campaigns')
+  }
+})
+
 appApi.post('/users/login', auth.loginRedirect, (req, res, next) => {
   passport.authenticate('local', (err: any, user: any, info: any) => {  // see: ./auth/local.js @LocalStrategy
     // console.warn("user from local", user)
@@ -92,14 +141,11 @@ appApi.post('/get-profile', auth.loginRequired, async (req, res, next)  => {
     const user = result.rows[0]
     // console.log('user', user)
     if (user) {
-      return handleResponse(res, 200, 'success', user);
+      return handleResponse(res, 200, 'success', auth.toAuthJSON(user));
     }
     return res.status(404).send("User does not exist")
   } catch (err) {
-    console.warn("Error on /get-profile for user: ", err)
-    return res.status(500).json({
-      error: `${err}`
-    })
+    return handleError(res, err, 'get-profile')
   }
 });
 
@@ -151,25 +197,28 @@ appApi.post('/update-profile', auth.loginRequired, async (req, res, next)  => {
       RETURNING *;
     `)
     return handleResponse(res, 200, "success", updatedUser.rows[0])
-
   } catch (err) {
-    console.warn("Error on /update-profile for user: ", err)
-    return res.status(500).json({
-      error: `${err}`
-    })
+    return handleError(res, err, 'update-profile')
   }
 });
 
-function handleResponse(res: any, code: any, statusMsg: any, user: any = {}) {
+function handleResponse(res: any, code: any, statusMsg: any, payload: any = {}) {
   /* Returns a user if user, else {status: message}
   * */
-  if (user) {
-    user.statusText = statusMsg;
-    return res.status(code).json(user);
+  if (payload) {
+    payload.statusText = statusMsg;
+    return res.status(code).json(payload);
   }
   res.status(code).json({
     status: code,
     statusText: statusMsg});
+}
+
+function handleError(res: any, err: Error, endpoint: string) {
+  console.warn(`Error on /${endpoint}: , ${err}`)
+    return res.status(500).json({
+      error: `${err}`
+    })
 }
 
 

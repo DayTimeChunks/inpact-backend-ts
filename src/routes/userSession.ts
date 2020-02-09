@@ -76,6 +76,11 @@ appApi.post('/users/login', auth.loginRedirect, (req, res, next) => {
   })(req, res, next);
 });
 
+appApi.get('/logout', (req, res, next) => {
+  req.logout();
+  handleResponse(res, 200, 'success');
+});
+
 appApi.post('/get-profile', auth.loginRequired, async (req, res, next)  => {
   // Returns user's profile (search by email)
   const email = req.body.user.email;
@@ -87,7 +92,7 @@ appApi.post('/get-profile', auth.loginRequired, async (req, res, next)  => {
     const user = result.rows[0]
     // console.log('user', user)
     if (user) {
-      return handleResponse(res, 200, 'success', auth.toAuthJSON(user));
+      return handleResponse(res, 200, 'success', user);
     }
     return res.status(404).send("User does not exist")
   } catch (err) {
@@ -99,7 +104,10 @@ appApi.post('/get-profile', auth.loginRequired, async (req, res, next)  => {
 });
 
 appApi.post('/update-profile', auth.loginRequired, async (req, res, next)  => {
-  const email = req.body.user.email;
+  /**
+   * user's properties arrive as camel-case, convert to snake-case before updating DB!
+   */
+  let email = req.body.user.email;
   try {
     const result = await dbService.query(SQL`
       SELECT * from users
@@ -111,17 +119,20 @@ appApi.post('/update-profile', auth.loginRequired, async (req, res, next)  => {
       return res.send("User does not exist")
     }
 
+    let { user_name, first_name, last_name,
+      country, about_me, address, education, experiences, interests } = user
+
     // Updates user's profile except avatar (see below for avatar)
-    const new_email = req.body.user.new_email ? req.body.user.new_email: email;
-    const user_name = req.body.user.user_name || user.user_name;
-    const first_name = req.body.user.first_name  || user.first_name;
-    const last_name = req.body.user.last_name || user.last_name;
-    const country = req.body.user.country || user.country;
-    const about_me = req.body.user.about_me || user.about_me;
-    const address = req.body.user.address || user.address;
-    const education = req.body.user.education || user.education;
-    const experiences = req.body.user.experiences || user.experiences;
-    const interests = req.body.user.interests || user.interests;
+    email = req.body.user.newEmail ? req.body.user.newEmail: email;
+    user_name = req.body.user.userName || user_name;
+    first_name = req.body.user.firstName  || first_name;
+    last_name = req.body.user.lastName || last_name;
+    country = req.body.user.country || country;
+    about_me = req.body.user.aboutMe || about_me;
+    address = req.body.user.address || address;
+    education = req.body.user.education || education;
+    experiences = req.body.user.experiences || experiences;
+    interests = req.body.user.interests || interests;
 
     // Pasword update
     const unencryptedPassword = req.body.user.password || undefined;
@@ -132,8 +143,8 @@ appApi.post('/update-profile', auth.loginRequired, async (req, res, next)  => {
     const password = newHash ? newHash: user.password;
 
     const updatedUser = await dbService.query(SQL`
-      UPDATE users
-      SET email=${new_email}, first_name=${first_name}, last_name=${last_name}, user_name=${user_name},
+      UPDATE public.users
+      SET email=${email}, first_name=${first_name}, last_name=${last_name}, user_name=${user_name},
         password=${password}, address=${address}, country=${country}, about_me=${about_me}, education=${education}, 
         experiences=${experiences}, interests=${interests}
       WHERE email=${email}

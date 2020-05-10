@@ -35,3 +35,13 @@ export interface IUser {
   inserted_at: string;
   updated_at: string;
 }
+
+export interface IUserProfileDB {
+  email: string;
+  user_name: string;
+  first_name: string;
+  last_name: string;
+  token: string;
+  about_me?: string;
+  avatar?: any;
+}

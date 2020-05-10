@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken'; // JWT: JSON Web Token, passed to front-end
 import { PostgresService } from '../services';
 import { RdsConfig } from '../conf';
 import SQL = require('sql-template');
-import { IRequest, IUser, IMessage } from '../types/domain';
+import { IRequest, IUser, IMessage, IUserProfileDB } from '../types/domain';
 import { QueryResult } from 'pg';
 
 export default class Auth {
@@ -97,7 +97,7 @@ export default class Auth {
     return next(); // move to next method in the express.route() chain
   }
 
-  public toAuthJSON(user: IUser) {
+  public toAuthJSON(user: IUser): IUserProfileDB {
     return {
       first_name: user.first_name,
       last_name: user.last_name,

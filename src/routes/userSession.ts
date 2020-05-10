@@ -4,6 +4,7 @@ import { BaseConfiguration } from '../conf';
 import { PostgresService } from '../services';
 import SQL = require('sql-template');
 import { LoremIpsum } from "lorem-ipsum";
+import { handleResponse, handleError } from './helpers';
 const passport = require('../auth/local');
 const appApi = express.Router()
 
@@ -107,12 +108,11 @@ appApi.post('/get-campaigns',  auth.loginRequired, async (req, res, next)  => {
 
 appApi.post('/users/login', auth.loginRedirect, (req, res, next) => {
   passport.authenticate('local', (err: any, user: any, info: any) => {  // see: ./auth/local.js @LocalStrategy
-    // console.warn("user from local", user)
-    if (err) { handleResponse(res, 500, 'error'); }
+    if (err) { handleResponse(res, 500, 'error', err); }
     if (!user) { handleResponse(res, 404, 'User not found or password was incorrect'); }
     if (user) {
       req.logIn(user, function (err) {
-        if (err) { handleResponse(res, 500, 'error'); }
+        if (err) { handleResponse(res, 500, 'error', err); }
         // A public version of the user is sent back,
         // to keep compatibility with front-end handling token vs. session handling.
         handleResponse(res, 200, 'success', {
@@ -201,25 +201,6 @@ appApi.post('/update-profile', auth.loginRequired, async (req, res, next)  => {
     return handleError(res, err, 'update-profile')
   }
 });
-
-function handleResponse(res: any, code: any, statusMsg: any, payload: any = {}) {
-  /* Returns a user if user, else {status: message}
-  * */
-  if (payload) {
-    payload.statusText = statusMsg;
-    return res.status(code).json(payload);
-  }
-  res.status(code).json({
-    status: code,
-    statusText: statusMsg});
-}
-
-function handleError(res: any, err: Error, endpoint: string) {
-  console.warn(`Error on /${endpoint}: , ${err}`)
-    return res.status(500).json({
-      error: `${err}`
-    })
-}
 
 
 module.exports = appApi;

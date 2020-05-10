@@ -4,6 +4,7 @@ const appApi = express.Router()
 
 // (1) Register all api endpoints
 appApi.use('/api', require('./userSession')); // default endpoint
+appApi.use('/api/projects', require('./projects'));
 // router.use('/api/contact', require('./transporter')); // mailgun endpoint
 
 // TODO: Could likely delete this part!!!
